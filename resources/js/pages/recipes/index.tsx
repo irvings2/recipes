@@ -15,6 +15,9 @@ interface Recipe {
     id: number;
     title: string;
     ingredients: string;
+    instructions: string;
+    description: string;
+    image_url: string; // Assuming image is a URL or null if not set
 }
 
 const deleteRecipe = (id: number) => {
@@ -48,7 +51,7 @@ export default function Index({ ...props }: { recipes: Recipe[] }) {
                         <TableRow>
                             <TableHead className="w-[100px]">ID</TableHead>
                             <TableHead>Title</TableHead>
-                            <TableHead className="text-center">Ingredients</TableHead>
+                            <TableHead className="text-center">Thumbnail</TableHead>
                             <TableHead className="text-center">Actions</TableHead>
                         </TableRow>
                     </TableHeader>
@@ -58,9 +61,15 @@ export default function Index({ ...props }: { recipes: Recipe[] }) {
                                 <TableCell className="w-[100px]">{recipe.id}</TableCell>
                                 <TableCell className="max-w-[200px] px-1">{recipe.title}</TableCell>
                                 <TableCell>
-                                    <div className='className="max-h-24 break-words" overflow-y-auto whitespace-pre-wrap'>{recipe.ingredients}</div>
+                                    <div className="flex justify-center">
+                                        {recipe.image_url ? (
+                                            <img src={recipe.image_url} alt={recipe.title} className="max-h-24" />
+                                        ) : (
+                                            <span>No image</span>
+                                        )}
+                                    </div>
                                 </TableCell>
-                                <TableCell>
+                                <TableCell className="text-center">
                                     <Link href={`/recipes/${recipe.id}/edit`} className="mr-2" prefetch>
                                         <Button>Edit</Button>
                                     </Link>

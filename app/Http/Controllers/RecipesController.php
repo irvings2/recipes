@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Http\Request;
 use App\Models\RecipesModel;
 
@@ -21,15 +22,19 @@ class RecipesController extends Controller
 
     public function store(Request $request)
     {
-        $request->validate([
+        $data = $request->validate([
             'title' => 'required|string|max:255',
             'description' => 'required|string',
             'ingredients' => 'required|string',
             'instructions' => 'required|string',
-            'image' => 'nullable|string',
+            'image' => 'required|image|max:2048', // Ensure image is a valid file
         ]);
 
-        RecipesModel::create($request->all());
+        if ($request->hasFile('image')) {
+            $data['image'] = $request->file('image')->store('images', 'public');
+        }
+
+        RecipesModel::create($data);
 
         return redirect()->route('recipes.index')->with('success', 'Recipe created successfully!');
     }
