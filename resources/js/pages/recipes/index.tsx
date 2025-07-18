@@ -2,7 +2,7 @@ import { Button } from '@/components/ui/button';
 import { Table, TableBody, TableCaption, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import AppLayout from '@/layouts/app-layout';
 import { type BreadcrumbItem } from '@/types';
-import { Head, Link } from '@inertiajs/react';
+import { Head, Link, router } from '@inertiajs/react';
 
 const breadcrumbs: BreadcrumbItem[] = [
     {
@@ -16,6 +16,18 @@ interface Recipe {
     title: string;
     ingredients: string;
 }
+
+const deleteRecipe = (id: number) => {
+    // Logic to delete the recipe
+    console.log(`Deleting recipe with ID: ${id}`);
+    if (!confirm('Are you sure you want to delete this recipe?')) {
+        return;
+    }
+    router.delete(route('recipes.destroy', id), {
+        onSuccess: () => console.log('Recipe deleted successfully'),
+        onError: (error) => console.error('Error deleting recipe:', error),
+    });
+};
 
 export default function Index({ ...props }: { recipes: Recipe[] }) {
     const { recipes } = props;
@@ -52,7 +64,14 @@ export default function Index({ ...props }: { recipes: Recipe[] }) {
                                     <Link href={`/recipes/${recipe.id}/edit`} className="mr-2" prefetch>
                                         <Button>Edit</Button>
                                     </Link>
-                                    <Button>Delete</Button>
+                                    <Button
+                                        onClick={() => {
+                                            deleteRecipe(recipe.id);
+                                        }}
+                                        variant="destructive"
+                                    >
+                                        Delete
+                                    </Button>
                                 </TableCell>
                             </TableRow>
                         ))}
