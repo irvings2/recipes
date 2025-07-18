@@ -1,6 +1,7 @@
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import { Textarea } from '@/components/ui/textarea';
 import AppLayout from '@/layouts/app-layout';
 import { type BreadcrumbItem } from '@/types';
 import { Head, useForm } from '@inertiajs/react';
@@ -12,13 +13,21 @@ const breadcrumbs: BreadcrumbItem[] = [
     },
 ];
 
+type RecipeFormData = {
+    title: string;
+    description: string;
+    ingredients: string;
+    instructions: string;
+    image: File | null;
+};
+
 export default function Recipes() {
-    const { data, setData, post, processing, errors, reset } = useForm({
+    const { data, setData, post, processing, errors, reset } = useForm<RecipeFormData>({
         title: '',
         description: '',
         ingredients: '',
         instructions: '',
-        image: '',
+        image: null,
     });
 
     const handleSubmit = (e: React.FormEvent) => {
@@ -27,6 +36,13 @@ export default function Recipes() {
             onSuccess: () => reset(),
             onError: () => console.error(errors),
         });
+    };
+
+    const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const file = e.target.files?.[0];
+        if (file) {
+            setData('image', file);
+        }
     };
 
     return (
@@ -48,10 +64,9 @@ export default function Recipes() {
                 </div>
                 <div>
                     <Label htmlFor="description">Description</Label>
-                    <Input
+                    <Textarea
                         id="description"
                         name="description"
-                        type="text"
                         placeholder="Enter recipe description"
                         className="mt-1 w-full"
                         value={data.description}
@@ -60,10 +75,9 @@ export default function Recipes() {
                 </div>
                 <div>
                     <Label htmlFor="ingredients">Ingredients</Label>
-                    <Input
+                    <Textarea
                         id="ingredients"
                         name="ingredients"
-                        type="text"
                         placeholder="List ingredients"
                         className="mt-1 w-full"
                         value={data.ingredients}
@@ -72,10 +86,9 @@ export default function Recipes() {
                 </div>
                 <div>
                     <Label htmlFor="instructions">Instructions</Label>
-                    <Input
+                    <Textarea
                         id="instructions"
                         name="instructions"
-                        type="text"
                         placeholder="Enter cooking instructions"
                         className="mt-1 w-full"
                         value={data.instructions}
@@ -84,15 +97,7 @@ export default function Recipes() {
                 </div>
                 <div>
                     <Label htmlFor="image">Image URL</Label>
-                    <Input
-                        id="image"
-                        name="image"
-                        type="text"
-                        placeholder="Enter image URL"
-                        className="mt-1 w-full"
-                        value={data.image}
-                        onChange={(e) => setData('image', e.target.value)}
-                    />
+                    <Input id="image" name="image" type="file" placeholder="Enter image URL" className="mt-1 w-full" onChange={handleImageChange} />
                 </div>
                 <Button type="submit">Create a recipe</Button>
             </form>
