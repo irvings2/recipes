@@ -9,7 +9,9 @@ class RecipesController extends Controller
 {
     public function index()
     {
-        return inertia('recipes/index');
+        return inertia('recipes/index', [
+            'recipes' => RecipesModel::all(),
+        ]);
     }
 
     public function create()
