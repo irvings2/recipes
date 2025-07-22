@@ -4,7 +4,8 @@ import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import AppLayout from '@/layouts/app-layout';
 import { type BreadcrumbItem } from '@/types';
-import { Head, router, useForm } from '@inertiajs/react';
+import { Head, router } from '@inertiajs/react';
+import { useState } from 'react';
 
 const breadcrumbs: BreadcrumbItem[] = [
     {
@@ -19,26 +20,40 @@ interface Recipe {
     description: string;
     ingredients: string;
     instructions: string;
-    image: string;
+    image: string | null; // Assuming image is a URL or null if not set
 }
 
-export default function Recipes({ ...props }: { recipe: Recipe }) {
-    const { recipe } = props;
-
-    const { data, setData, post, processing, errors, reset } = useForm({
-        title: recipe.title,
-        description: recipe.description,
-        ingredients: recipe.ingredients,
-        instructions: recipe.instructions,
-        image: recipe.image,
-    });
+export default function Recipes({ recipe }: { recipe: Recipe }) {
+    const [title, setTitle] = useState<string>(recipe.title);
+    const [description, setDescription] = useState<string>(recipe.description);
+    const [ingredients, setIngredients] = useState<string>(recipe.ingredients);
+    const [instructions, setInstructions] = useState<string>(recipe.instructions);
+    const [image, setImage] = useState<File | null>(null);
 
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
-        router.put(route('recipes.update', recipe.id), data, {
-            onSuccess: () => reset(),
-            onError: (errors) => console.error(errors),
-        });
+        router.post(
+            route('recipes.update', recipe.id),
+            {
+                title,
+                description,
+                ingredients,
+                instructions,
+                image, // Send null if no image is selected
+                _method: 'PUT',
+            },
+            {
+                forceFormData: true,
+                onError: (errors) => console.error(errors),
+            },
+        );
+    };
+
+    const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const file = e.target.files?.[0];
+        if (file) {
+            setImage(file);
+        }
     };
 
     return (
@@ -54,8 +69,8 @@ export default function Recipes({ ...props }: { recipe: Recipe }) {
                         type="text"
                         placeholder="Enter recipe title"
                         className="mt-1 w-full"
-                        value={data.title}
-                        onChange={(e) => setData('title', e.target.value)}
+                        value={title}
+                        onChange={(e) => setTitle(e.target.value)}
                     />
                 </div>
                 <div>
@@ -65,8 +80,8 @@ export default function Recipes({ ...props }: { recipe: Recipe }) {
                         name="description"
                         placeholder="Enter recipe description"
                         className="mt-1 w-full"
-                        value={data.description}
-                        onChange={(e) => setData('description', e.target.value)}
+                        value={description}
+                        onChange={(e) => setDescription(e.target.value)}
                     />
                 </div>
                 <div>
@@ -76,8 +91,8 @@ export default function Recipes({ ...props }: { recipe: Recipe }) {
                         name="ingredients"
                         placeholder="List ingredients"
                         className="mt-1 w-full"
-                        value={data.ingredients}
-                        onChange={(e) => setData('ingredients', e.target.value)}
+                        value={ingredients}
+                        onChange={(e) => setIngredients(e.target.value)}
                     />
                 </div>
                 <div>
@@ -87,21 +102,13 @@ export default function Recipes({ ...props }: { recipe: Recipe }) {
                         name="instructions"
                         placeholder="Enter cooking instructions"
                         className="mt-1 w-full"
-                        value={data.instructions}
-                        onChange={(e) => setData('instructions', e.target.value)}
+                        value={instructions}
+                        onChange={(e) => setInstructions(e.target.value)}
                     />
                 </div>
                 <div>
-                    <Label htmlFor="image">Image URL</Label>
-                    <Input
-                        id="image"
-                        name="image"
-                        type="text"
-                        placeholder="Enter image URL"
-                        className="mt-1 w-full"
-                        value={data.image}
-                        onChange={(e) => setData('image', e.target.value)}
-                    />
+                    <Label htmlFor="image">Image</Label>
+                    <Input id="image" name="image" type="file" placeholder="Enter image URL" className="mt-1 w-full" onChange={handleImageChange} />
                 </div>
                 <Button type="submit">Edit a recipe</Button>
             </form>

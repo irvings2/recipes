@@ -39,7 +39,7 @@ export default function Index({ ...props }: { recipes: Recipe[] }) {
             <Head title="Recipes" />
 
             <div className="p-4">
-                <Link href="/recipes/create" prefetch>
+                <Link href="/recipes/create">
                     <Button>Create a recipe</Button>
                 </Link>
             </div>
@@ -70,7 +70,7 @@ export default function Index({ ...props }: { recipes: Recipe[] }) {
                                     </div>
                                 </TableCell>
                                 <TableCell className="text-center">
-                                    <Link href={`/recipes/${recipe.id}/edit`} className="mr-2" prefetch>
+                                    <Link href={`/recipes/${recipe.id}/edit`} className="mr-2">
                                         <Button>Edit</Button>
                                     </Link>
                                     <Button

@@ -47,16 +47,25 @@ class RecipesController extends Controller
 
     public function update(Request $request, $id)
     {
-        $request->validate([
+        $data = $request->validate([
             'title' => 'required|string|max:255',
             'description' => 'required|string',
             'ingredients' => 'required|string',
             'instructions' => 'required|string',
-            'image' => 'nullable|string',
+            'image' => 'required|image|max:2048', // Ensure image is a valid file
         ]);
 
         $recipe = RecipesModel::findOrFail($id);
-        $recipe->update($request->all());
+
+        if ($request->hasFile('image')) {
+            // Delete the old image if it exists and the property exists on the model
+            if (isset($recipe->image) && !empty($recipe->image)) {
+                Storage::disk('public')->delete($recipe->image);
+            }
+            $data['image'] = $request->file('image')->store('images', 'public');
+        }
+
+        $recipe->update($data);
 
         return redirect()->route('recipes.index')->with('success', 'Recipe updated successfully!');
     }

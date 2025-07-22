@@ -96,7 +96,7 @@ export default function Recipes() {
                     />
                 </div>
                 <div>
-                    <Label htmlFor="image">Image URL</Label>
+                    <Label htmlFor="image">Image</Label>
                     <Input id="image" name="image" type="file" placeholder="Enter image URL" className="mt-1 w-full" onChange={handleImageChange} />
                 </div>
                 <Button type="submit">Create a recipe</Button>
